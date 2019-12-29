@@ -10,6 +10,8 @@ Go back in your Network and open the URL to the IP you entered. http://yourIP
 
 PLEASE don't use the relay for 110V or 220V on power grid! Just for low voltage switching!
 
+SetUp Arduino IDE for Espressif: https://m.heise.de/make/artikel/ESP-Boards-mit-der-Arduino-IDE-programmieren-4130861.html?seite=all
+
 Module from Front View
 
 ![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/modul1.jpg)
