@@ -15,17 +15,17 @@ SetUp Arduino IDE for Espressif: https://m.heise.de/make/artikel/ESP-Boards-mit-
 
 Module from Front View
 
-![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/modul1.jpg)
+![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/images/modul1.jpg)
 
 Module from Side View
 
-![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/modul2.jpg)
+![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/images/modul2.jpg)
 
 Start Page when view in Browser
 
-![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/relay.jpg)
+![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/images/relay.jpg)
 
 Settings Page to edit parameters
 
-![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/settings.jpg)
+![alt text](https://raw.githubusercontent.com/sschori/ESP01RelayModul/master/images/settings.jpg)
 
