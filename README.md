@@ -8,6 +8,7 @@ You will land on the StartPage. Go to Settings and enter all Data from your WiFi
 It's easier when you set a static IP. Save it and Wait 2 minutes.
 Go back in your Network and open the URL to the IP you entered. http://yourIP
 
+PLEASE don't use the relay for 110V or 220V on power grid! Just for low voltage switching!
 
 Module from Front View
 
