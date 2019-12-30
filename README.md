@@ -1,11 +1,14 @@
 # ESP01RelayModul
 Software for the 3€ China Espressif ESP8266 ESP-01 Relay Modul.
 
+Inspired by the very good article in Elektor Magazine 
+https://www.elektormagazine.de/news/eineinfacher2wlanschalterderfunktioniert
+
 Just take the RelayBoard.ino file and compile and upload it with the Arduino IDE to the ESP-01 Board.
-Put the ESP-01 back in the Relay Module ans start it up.
-The ESP-01 will open a WiFi network. Go in the Network and open http://192.168.1.1
+Put the ESP-01 back in the Relay Module and start it up.
+The ESP-01 will open it's own WiFi network named "Relay-Modul". Go in this Network and open Browser at http://192.168.1.1
 You will land on the StartPage. Go to Settings and enter all Data from your WiFi Network.
-It's easier when you set a static IP. Save it and wait 2 minutes.
+It's easier when you set a static IP. Save it and wait 1 minute.
 Go back in your Network and open the URL to the IP you entered. http://yourIP
 Enjoy your IoT Relay.
 
