@@ -1,6 +1,5 @@
 #include <ESP8266WiFi.h>
 #include <HardwareSerial.h>
-#include <WiFiUdp.h>
 #include <EEPROM.h>
 
 //Relay
@@ -10,7 +9,6 @@ bool relay = false;
 //WiFi
 #define MAX_CLIENTS 10
 WiFiServer server(80); 
-WiFiUDP UDP;  
 int wifiScanCount = 0;
 WiFiClient *clients[MAX_CLIENTS] = { NULL };
 String *clientsCurrentLine[MAX_CLIENTS] = { NULL };
@@ -43,7 +41,8 @@ String dns = "";
 String powerOn = "";
 
 //EEPROM Struct
-  struct { 
+  struct 
+  { 
     uint val = 0;
     char str[80] = "";
   } data;
@@ -51,15 +50,23 @@ String powerOn = "";
 void setup()
 {
   EEPROM.begin(256);
+
+  inputString.reserve(200);
+  ssid.reserve(40);
+  password.reserve(30);
+  ipType.reserve(1);
+  ip.reserve(15);
+  subnet.reserve(15);
+  defaultgw.reserve(15);
+  dns.reserve(15);
+  powerOn.reserve(1);  
   
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH); 
 
   pinMode(RELAY_PORT, OUTPUT);
   digitalWrite(RELAY_PORT, HIGH); 
-  
-  inputString.reserve(200);
-  
+ 
   Serial.begin(115200);
 
   readValuesFromEeprom();
@@ -708,9 +715,9 @@ void sendStyle(WiFiClient client)
   client.println("  cursor: pointer;");
   client.println("  border: 2px solid #004270;");
   client.println("}");
-  client.println("input[type=submit]:hover");
+  client.println("input[type=submit]:hover, input[type=button]:hover");
   client.println("{");
-  client.println("  background-color: #004270;");
+  client.println("  background-color: rgb(80, 123, 153);");
   client.println("  color: white;");
   client.println("}");
   client.println("input[type=submit]:disabled");
