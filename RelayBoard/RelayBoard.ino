@@ -12,10 +12,10 @@ WiFiServer server(80);
 int wifiScanCount = 0;
 WiFiClient *clients[MAX_CLIENTS] = { NULL };
 String *clientsCurrentLine[MAX_CLIENTS] = { NULL };
+String *clientsHTTPRequest[MAX_CLIENTS] = { NULL };
 
 //HTTP Protocol
 int httpMethod = 0;
-int newLineCount = 0;
 
 //RS232
 String inputString = "";         // a string to hold incoming data
@@ -123,8 +123,12 @@ void loop()
           }
           if (c == '\n') //Zeile abgeschlossen
           {
-            Serial.println(*clientsCurrentLine[i]);  //debug out of http protocol lines
-            answerRequest(*clientsCurrentLine[i], *clients[i]);
+            //Serial.println(*clientsCurrentLine[i]);  //debug out of http protocol lines
+            if (clientsCurrentLine[i]->startsWith("GET "))
+            {
+              clientsHTTPRequest[i] = clientsCurrentLine[i];
+            }
+            answerRequest(*clientsCurrentLine[i], *clients[i], *clientsHTTPRequest[i]);
             clientsCurrentLine[i] = new String();
           }
         }
@@ -137,59 +141,59 @@ void loop()
         clients[i] = NULL;
         delete clientsCurrentLine[i];
         clientsCurrentLine[i] = NULL;
+        delete clientsHTTPRequest[i];
+        clientsHTTPRequest[i] = NULL;
       }
   }
 }
 
-void answerRequest(String currentLine, WiFiClient client)
-{
-  if (currentLine.startsWith("GET / ")) // Startseite
+void answerRequest(String currentLine, WiFiClient client, String httpRequest)
+{ 
+  if (currentLine.length() == 0) //Ende des HTTP Request
   {
-    sendStartPage(client);
-    httpMethod = 1;
-  } 
-  if (currentLine.startsWith("GET /ON ")) // Startseite
-  {
-    digitalWrite(RELAY_PORT, LOW);
-    relay = true;
-    sendStartPage(client);
-    httpMethod = 1;
-  } 
-  if (currentLine.startsWith("GET /OFF ")) // Startseite
-  {
-    digitalWrite(RELAY_PORT, HIGH);
-    relay = false;
-    sendStartPage(client);
-    httpMethod = 1;
-  }     
-  if (currentLine.startsWith("GET /settings ")) // Startseite
-  {
-    sendSettingsPage(client);
-    httpMethod = 1;
-  }   
-  else if (currentLine.startsWith("GET /save?"))  //Nach Save Request
-  {
-    saveSettings(currentLine);
-    sendSavedPage(client);
-    newLineCount = 0;
-    httpMethod = 5;
-  }     
-  else if (currentLine.length() == 0) //Ende des HTTP Request
-  {
-    newLineCount++;
-    if ((httpMethod == 1 || httpMethod == 5) && newLineCount == 1)
-    {
-      client.flush();
-      client.stop(); 
-      if (httpMethod == 5)
+      if (httpRequest.startsWith("GET / ")) // Startseite
       {
-        delay(1000);
-        ESP.restart();
+        sendStartPage(client);
+        httpMethod = 1;
+      } 
+      else if (httpRequest.startsWith("GET /ON ")) // Startseite
+      {
+        digitalWrite(RELAY_PORT, LOW);
+        relay = true;
+        sendStartPage(client);
+        httpMethod = 1;
+      } 
+      else if (httpRequest.startsWith("GET /OFF ")) // Startseite
+      {
+        digitalWrite(RELAY_PORT, HIGH);
+        relay = false;
+        sendStartPage(client);
+        httpMethod = 1;
+      }     
+      else if (httpRequest.startsWith("GET /settings ")) // Startseite
+      {
+        sendSettingsPage(client);
+        httpMethod = 1;
+      }   
+      else if (httpRequest.startsWith("GET /save?"))  //Nach Save Request
+      {
+        saveSettings(httpRequest);
+        sendSavedPage(client);
+        httpMethod = 5;
+      } 
+  
+      if (httpMethod == 1 || httpMethod == 5)
+      {
+        client.flush();
+        client.stop(); 
+        if (httpMethod == 5)
+        {
+          delay(1000);
+          ESP.restart();
+        }
+        httpMethod = 0;
+        digitalWrite(LED_BUILTIN, HIGH); 
       }
-      newLineCount = 0;
-      httpMethod = 0;
-      digitalWrite(LED_BUILTIN, HIGH); 
-    }
   }
 }
 
@@ -384,16 +388,19 @@ bool startWiFiClient()
  
   WiFi.mode(WIFI_STA);
 
-  IPAddress ipAddress;
-  ipAddress.fromString(ip);
-  IPAddress gatewayAddress;
-  gatewayAddress.fromString(defaultgw);
-  IPAddress dnsAddress;
-  dnsAddress.fromString(dns);
-  IPAddress subnetAddress;
-  subnetAddress.fromString(subnet);
+  if (ipType.startsWith("1"))
+  {
+    IPAddress ipAddress;
+    ipAddress.fromString(ip);
+    IPAddress gatewayAddress;
+    gatewayAddress.fromString(defaultgw);
+    IPAddress dnsAddress;
+    dnsAddress.fromString(dns);
+    IPAddress subnetAddress;
+    subnetAddress.fromString(subnet);
   
-  WiFi.config(ipAddress, gatewayAddress, dnsAddress, subnetAddress); 
+	  WiFi.config(ipAddress, gatewayAddress, dnsAddress, subnetAddress); 
+  }
  
   WiFi.begin(ssid, password);
 
