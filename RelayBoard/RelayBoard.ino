@@ -524,6 +524,7 @@ void sendStartPage(WiFiClient client)
   client.println("<title>WiFi Relay</title>");
   sendFavicon(client);
   client.println("</HEAD><BODY>");
+  sendStyle(client);
   client.println("<h1>WiFi Relay</h1>");  
   client.println("<hr>");
   client.println("<h2>WiFi Relay:</h2>"); 
@@ -542,7 +543,6 @@ void sendStartPage(WiFiClient client)
   client.println(">");
   client.println("<br><br><hr>");
   client.print("<br><a href=\"/settings\">Settings</a>");
-  sendStyle(client);
   client.println("</BODY></HTML>");
   client.println();
   client.flush();
@@ -557,6 +557,7 @@ void sendSettingsPage(WiFiClient client)
   client.println("<title>WiFi Relay</title>");
   sendFavicon(client);
   client.println("</HEAD><BODY>");
+  sendStyle(client);
   client.println("<h1>WiFi Relay Settings:</h1>");  
   client.println("<hr>");
   
@@ -604,22 +605,22 @@ void sendSettingsPage(WiFiClient client)
   client.println("</select>");
   client.println("</td></tr><tr><td>");
   client.println("IP:</td><td>");
-  client.print("<input type=\"text\" id=\"ip\" name=\"ip\" minlength=\"7\" maxlength=\"15\" size=\"15\" value=\"");
+  client.print("<input type=\"text\" id=\"ip\" name=\"ip\" minlength=\"7\" maxlength=\"15\" size=\"15\" pattern=\"^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$\" value=\"");
   client.print(ip);
   client.println("\">"); 
   client.println("</td></tr><tr><td>"); 
   client.println("Subnet:</td><td>");
-  client.print("<input type=\"text\" id=\"subnet\" name=\"subnet\" minlength=\"7\" maxlength=\"15\" size=\"15\" value=\"");
+  client.print("<input type=\"text\" id=\"subnet\" name=\"subnet\" minlength=\"7\" maxlength=\"15\" size=\"15\" pattern=\"^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$\" value=\"");
   client.print(subnet);
   client.println("\">");
   client.println("</td></tr><tr><td>");   
   client.println("Default Gateway:</td><td>");
-  client.print("<input type=\"text\" id=\"defaultgw\" name=\"defaultgw\" minlength=\"7\" maxlength=\"15\" size=\"15\" value=\"");
+  client.print("<input type=\"text\" id=\"defaultgw\" name=\"defaultgw\" minlength=\"7\" maxlength=\"15\" size=\"15\" pattern=\"^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$\" value=\"");
   client.print(defaultgw);
   client.println("\"/>");  
   client.println("</td></tr><tr><td>");  
   client.println("DNS Server:</td><td>");
-  client.print("<input type=\"text\" id=\"dns\" name=\"dns\" minlength=\"7\" maxlength=\"15\" size=\"15\" value=\"");
+  client.print("<input type=\"text\" id=\"dns\" name=\"dns\" minlength=\"7\" maxlength=\"15\" size=\"15\" pattern=\"^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$\" value=\"");
   client.print(dns);
   client.println("\"/>");     
   client.println("</td></tr></table>");
@@ -671,7 +672,6 @@ void sendSettingsPage(WiFiClient client)
   client.println("}");
   client.println("changeIPType();");
   client.println("</script>");
-  sendStyle(client);
   client.println("</BODY></HTML>");
   client.println();
   client.flush();
@@ -680,6 +680,7 @@ void sendSettingsPage(WiFiClient client)
 void sendStyle(WiFiClient client)
 {
   client.println("<style>");
+  client.println("input:invalid {color: red;}");  
   client.println("body ");
   client.println("{");
   client.println("  background: #004270;");
