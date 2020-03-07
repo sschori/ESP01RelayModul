@@ -10,6 +10,7 @@ bool relay = false;
 #define MAX_CLIENTS 10
 WiFiServer server(80); 
 int wifiScanCount = 0;
+int32_t ssidVolume[50];
 WiFiClient *clients[MAX_CLIENTS] = { NULL };
 String *clientsCurrentLine[MAX_CLIENTS] = { NULL };
 String *clientsHTTPRequest[MAX_CLIENTS] = { NULL };
@@ -89,6 +90,11 @@ void setup()
 
 void loop()
 {
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    startWiFiClient();
+  }
+    
   WiFiClient client = server.available();
 
   checkRS232();
@@ -172,6 +178,7 @@ void answerRequest(String currentLine, WiFiClient client, String httpRequest)
       }     
       else if (httpRequest.startsWith("GET /settings ")) // Startseite
       {
+        wifiScanCount = scanWiFi();
         sendSettingsPage(client);
         httpMethod = 1;
       }   
@@ -363,6 +370,10 @@ void ESPserialEvent()
 int scanWiFi()
 {
   int networksFound = WiFi.scanNetworks(false, true);
+  for (int i = 0; i < networksFound && i < 50; i++)
+  {
+    ssidVolume[i] = WiFi.RSSI(i);
+  }
   return networksFound;
 }
 
@@ -573,8 +584,13 @@ void sendSettingsPage(WiFiClient client)
     {
       client.print(" selected=\"selected\"");
     }
-    client.print(">");
+    client.print(" value=\"");
     client.print(WiFi.SSID(i).c_str());
+    client.print("\">");
+    client.print(WiFi.SSID(i).c_str());
+    client.print("    (");
+    client.print(ssidVolume[i]);
+    client.print("dBm)");
     client.println("</option>");
   }
   client.println("</select>");
