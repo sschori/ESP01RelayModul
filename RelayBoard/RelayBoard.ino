@@ -90,7 +90,7 @@ void setup()
 
 void loop()
 {
-  if (WiFi.status() != WL_CONNECTED)
+  if (WiFi.getMode() == WIFI_AP &&  WiFi.status() != WL_CONNECTED)
   {
     startWiFiClient();
   }
