@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <HardwareSerial.h>
 #include <EEPROM.h>
+#include <ESP8266mDNS.h>  	
 
 //Relay
 #define RELAY_PORT 0
@@ -30,7 +31,8 @@ int defaultgw_adr = 120; // len = 15
 int dns_adr = 140; // len = 15
 int ipType_adr = 160; //len = 1
 int powerOn_adr = 165; //len = 1
-//next at 170
+int mDNS_adr = 170; //len=20
+//next at 195
 
 String ssid = "";
 String password = "";
@@ -40,6 +42,7 @@ String subnet = "";
 String defaultgw = "";
 String dns = "";
 String powerOn = "";
+String mDNS_name = "";
 
 //EEPROM Struct
   struct 
@@ -85,7 +88,11 @@ void setup()
     startWifiAccessPoint();
   }
 
+  MDNS.begin(mDNS_name);
+
   server.begin();
+
+  MDNS.addService("http", "tcp", 80);	
 }
 
 void loop()
@@ -94,6 +101,8 @@ void loop()
   {
     startWiFiClient();
   }
+
+  MDNS.update();
     
   WiFiClient client = server.available();
 
@@ -217,6 +226,7 @@ void saveSettings(String inputData)
   dns = "";
   ipType = "";
   powerOn = "";
+  String mdns = "";
   
   for(int i = 0 ; i < inputData.length() ; i++)
   {
@@ -270,6 +280,12 @@ void saveSettings(String inputData)
       dns = urldecode(dns);
       token="";
     } 
+    else if (foundStart == true && (c == '&' || c == ' ') && token.startsWith("mdns="))
+    {
+      mdns=token.substring(5, token.length()-1);
+      mdns = urldecode(mdns);
+      token="";
+    }  
     else if (foundStart == true && (c == '&' || c == ' ') && token.startsWith("powerOn="))
     {
       powerOn=token.substring(8, token.length()-1);;
@@ -285,6 +301,7 @@ void saveSettings(String inputData)
   saveEEPROM(dns, dns_adr, 15);
   saveEEPROM(ipType, ipType_adr, 1);
   saveEEPROM(powerOn, powerOn_adr, 1);
+  saveEEPROM(mdns, mDNS_adr, 20);
   EEPROM.commit(); 
 
   readValuesFromEeprom();
@@ -300,6 +317,16 @@ void readValuesFromEeprom()
   dns = readEEPROM(dns_adr, 15);
   ipType = readEEPROM(ipType_adr, 1);
   powerOn = readEEPROM(powerOn_adr, 1);
+  mDNS_name = readEEPROM(mDNS_adr, 20);
+
+  if (mDNS_name.length() == 0)
+  {
+    String mdns = "myrelaycard";
+
+    saveEEPROM(mdns, mDNS_adr, 20);
+    EEPROM.commit(); 
+    readValuesFromEeprom();   
+  }
 }
 
 void saveEEPROM(String in, int adr, int len)
@@ -433,6 +460,12 @@ bool startWiFiClient()
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  if (mDNS_name.length() > 0)
+  {
+    Serial.print("mDNS address: http://");
+    Serial.print(mDNS_name);
+    Serial.println(".local");
+  }
 
   return true;
 }
@@ -512,7 +545,7 @@ void sendSavedPage(WiFiClient client)
   }
   else
   {
-    client.println("Please enter the IP which has set by DHCP from your Router");
+    client.println("Please enter the IP which has set by DHCP from your Router or the mDNS name followed by .local");
   }
 
   sendStyle(client);
@@ -639,7 +672,15 @@ void sendSettingsPage(WiFiClient client)
   client.print("<input type=\"text\" id=\"dns\" name=\"dns\" minlength=\"7\" maxlength=\"15\" size=\"15\" pattern=\"^((\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$\" value=\"");
   client.print(dns);
   client.println("\"/>");     
+
+  client.println("</td></tr><tr><td>");  
+  client.println("mDNS Name:</td><td>");  
+  client.print("<input type=\"text\" id=\"mdns\" name=\"mdns\" minlength=\"3\" maxlength=\"20\" size=\"22\" pattern=\"[a-zA-Z]{1}[a-zA-Z0-9]{1,19}\" title=\"Enter the address to find the module in a browser. To open the website, type the extered name in the Browser, followed by '.local'\" value=\"");
+  client.print(mDNS_name);
+  client.println("\"/>.local");
+
   client.println("</td></tr></table>");
+
   client.println("<br><hr>");
 
   client.println("<h2>Relay:</h2>");   
