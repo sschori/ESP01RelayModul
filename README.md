@@ -10,7 +10,7 @@ The ESP-01 will open it's own WiFi network named "Relay-Modul". Go in this Netwo
 You will land on the StartPage. Go to Settings and enter all Data from your WiFi Network.
 It's easier when you set a static IP. Save it and wait 1 minute.
 Go back in your Network and open the URL to the IP you entered. http://yourIP
-Or new! use mDSN direct http://myrelaycard.local
+Or new! use mDNS direct http://myrelaycard.local
 Enjoy your IoT Relay.
 
 PLEASE don't use the relay for 110V or 220V on power grid! Just for low voltage switching!
